@@ -1,3 +1,5 @@
-# matricula-universitaria
-Proyecto asignatura programación interactiva.
-Prueba
+Proyecto de "Matricula academica" para la asignatura Programación interactiva.
+
+Creadores:
+Juan Arias
+Kevin Tobar
