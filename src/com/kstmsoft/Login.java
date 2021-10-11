@@ -1,3 +1,5 @@
+package com.kstmsoft;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,7 +14,7 @@ public class Login extends JFrame{
     JButton ingresar;
     Container contenedor;
     Eventos push;
-    static Cliente student;
+    static Client client;
 
     public Login(){
         panelBienvenida = new JPanel();
@@ -21,7 +23,7 @@ public class Login extends JFrame{
 
         BufferedImage logo= null;
         try {
-            logo = ImageIO.read(new File("Resources/LogoU.png"));
+            logo = ImageIO.read(new File("src/com/kstmsoft/Resources/LogoU.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,57 +77,23 @@ public class Login extends JFrame{
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
-
     }
-
 
     public static void main (String[] args){
         Login ventana = new Login();
-        student = new Cliente();
+        client = new Client("localhost", 8080);
     }
 
     class Eventos implements ActionListener{
-
         public void actionPerformed(ActionEvent ae){
             if(ae.getSource() == ingresar){
                 try{
-                    int n= Integer.parseInt(codigo.getText());
-                    switch(n){
-                        case 2141121:   confirmacion.setText("Bienvenida Camila.");
-                                        confirmacion.setVisible(true);
-                                        student.conectar("127.0.0.1");
-                                        break;
-
-                        case 1932287:   confirmacion.setText("Bienvenido Omar.");
-                                        confirmacion.setVisible(true);
-                                        student.conectar("127.0.0.1");
-                                        break;
-
-                        case 2129929:   confirmacion.setText("Bienvenida Allison.");
-                                        confirmacion.setVisible(true);
-                                        student.conectar("127.0.0.1");
-                                        break;
-
-                        case 1946950:   confirmacion.setText("Bienvenido Santiago.");
-                                        confirmacion.setVisible(true);
-                                        student.conectar("127.0.0.1");
-                                        break;
-
-                        case 2032077:   confirmacion.setText("Bienvenido Lautaro.");
-                                        confirmacion.setVisible(true);
-                                        student.conectar("127.0.0.1");
-                                        break;
-
-                        default:        confirmacion.setText("Usted no pertenece a la universidad o escribió mal su código.");
-                                        confirmacion.setVisible(true);
-                                        break;
-
-                            }
-                    }catch (NumberFormatException a){
-                        a.printStackTrace();
-                        confirmacion.setText("Escriba numeros, no texto.");
-                        confirmacion.setVisible(true);
-                    }
+                    client.login();
+                }catch (NumberFormatException a){
+                    a.printStackTrace();
+                    confirmacion.setText("Escriba numeros, no texto.");
+                    confirmacion.setVisible(true);
+                }
             }
         }
     }
