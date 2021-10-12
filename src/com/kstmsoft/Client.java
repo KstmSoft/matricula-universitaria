@@ -26,8 +26,8 @@ public class Client {
         }
     }
 
-    public ArrayList<Course> login(String id) {
-        Request request = new Request("login", id);
+    public ArrayList<Course> getCourses(String id) {
+        Request request = new Request("get_courses", id);
         return (ArrayList<Course>) sendRequest(request);
     }
 
@@ -41,14 +41,14 @@ public class Client {
         return (int)sendRequest(request);
     }
 
-    public boolean addCourse(String id, String courseId){
+    public void addCourse(String id, String courseId){
         Request request = new Request("add_course", id, courseId);
-        return (boolean)sendRequest(request);
+        sendRequest(request);
     }
 
-    public boolean cancelCourse(String id, String courseId){
+    public void cancelCourse(String id, String courseId){
         Request request = new Request("cancel_course", id, courseId);
-        return (boolean)sendRequest(request);
+        sendRequest(request);
     }
 
     private Object sendRequest(Request request){

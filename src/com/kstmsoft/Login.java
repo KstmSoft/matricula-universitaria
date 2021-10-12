@@ -43,7 +43,7 @@ public class Login extends JFrame{
         config.weightx=0;
         config.weighty=0;
 
-        info = new JLabel("Por favor, digite su codigo (Ej. 1842423)");
+        info = new JLabel("Por favor, digite su codigo (Ej. 1841369)");
         config.fill = GridBagConstraints.NONE;
         config.gridx = 1;
         config.gridy=1;
@@ -90,9 +90,9 @@ public class Login extends JFrame{
         public void actionPerformed(ActionEvent ae){
             if(ae.getSource() == ingresar){
                 try{
-                    ArrayList<Course> courseList = client.login(codigo.getText());
+                    ArrayList<Course> courseList = client.getCourses(codigo.getText());
                     if(!courseList.isEmpty()){
-                        new Sira(client, courseList);
+                        new Sira(client, codigo.getText());
                         setVisible(false);
                     }else{
                         confirmacion.setText("El usuario no tiene materias registradas o no existe.");

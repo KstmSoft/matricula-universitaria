@@ -48,14 +48,16 @@ public class Server {
             try{
                 request = (Request) inputStream.readObject();
                 switch (request.getQuery()){
-                    case "login":
-                        sendToClient(login(request.getArgs()[0]));
+                    case "student_exist":
+                        sendToClient(studentExist(request.getArgs()[0]));
+                    case "get_courses":
+                        sendToClient(getCourses(request.getArgs()[0]));
                         break;
                     case "add_course":
-                        sendToClient(addCourse(request.getArgs()[0], request.getArgs()[1]));
+                        addCourse(request.getArgs()[0], request.getArgs()[1]);
                         break;
                     case "cancel_course":
-                        sendToClient(cancelCourse(request.getArgs()[0], request.getArgs()[1]));
+                        cancelCourse(request.getArgs()[0], request.getArgs()[1]);
                         break;
                     case "course_credits":
                         sendToClient(getCourseCredits(request.getArgs()[0]));
@@ -70,12 +72,30 @@ public class Server {
         }
     }
 
-    private ArrayList<Course> login(String id){
+    private boolean studentExist(String id) {
+        String sql;
+        sql = "SELECT EXISTS(SELECT count(id) FROM students WHERE id = '" + id + "')";
+        boolean result = false;
+        try{
+            Connection connection = database.connect();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            if(resultSet.next()){
+                result = resultSet.getBoolean(1);
+            }
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return result;
+    }
+
+    private ArrayList<Course> getCourses(String id){
         ArrayList<Course> courses = new ArrayList<>();
         String sql;
         sql = "SELECT enrolled_students.course_id AS id," +
                 " courses.name AS course_name," +
-                " courses.credits AS credits" +
+                " courses.credits AS credits," +
                 " courses.quota AS quota" +
                 " FROM enrolled_students JOIN courses" +
                 " ON enrolled_students.course_id = courses.id" +
@@ -95,43 +115,43 @@ public class Server {
         return courses;
     }
 
-    private boolean cancelCourse(String id, String courseId){
+    private void cancelCourse(String id, String courseId){
         String sql;
-        sql = "DELETE FROM enrolled_students WHERE student_id = " + id + " AND course_id = " + courseId;
+        sql = "DELETE FROM enrolled_students WHERE student_id = '" + id + "' AND course_id = '" + courseId + "'";
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
-            int update = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
             connection.close();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
-        return false;
     }
 
-    private boolean addCourse(String id, String courseId){
+    private void addCourse(String id, String courseId){
         String sql;
-        sql = "INSERT INTO enrolled_students (student_id, course_id) VALUES ("+id+", "+courseId+")";
+        sql = "INSERT INTO enrolled_students (student_id, course_id) VALUES ('"+id+"', '"+courseId+"')";
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
-            int update = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
             connection.close();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
-        return false;
     }
 
     private int getCourseCredits(String id){
         String sql;
-        sql = "SELECT credits FROM courses WHERE id = " + id;
+        sql = "SELECT credits FROM courses WHERE id = '" + id + "'";
         int credits = 0;
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
-            credits = resultSet.getInt(1);
+            if(resultSet.next()){
+                credits = resultSet.getInt(1);
+            }
             connection.close();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
@@ -141,13 +161,15 @@ public class Server {
 
     public int getCourseQuota(String id) {
         String sql;
-        sql = "SELECT quota FROM courses WHERE id = " + id;
+        sql = "SELECT quota FROM courses WHERE id = '" + id + "'";
         int quota = 0;
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
-            quota = resultSet.getInt(1);
+            if(resultSet.next()) {
+                quota = resultSet.getInt(1);
+            }
             connection.close();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
@@ -165,7 +187,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server(8080);
+        new Server(8080);
     }
 }
 

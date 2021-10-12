@@ -21,12 +21,16 @@ public class Sira extends JFrame {
     JLabel l1,l2, imageni,imagend, hora;
     JTable tabla;
     SiraEventos push;
-    ArrayList<Course> courseList;
-    Client client;
 
-    public Sira(Client client, ArrayList<Course> courseList){
-        this.courseList = courseList;
+    Client client;
+    String studentId;
+    ArrayList<Course> courseList;
+
+    public Sira(Client client, String studentId){
+
         this.client = client;
+        this.studentId = studentId;
+
         push = new SiraEventos();
     //JPanel arriba
         arriba= new JPanel();
@@ -86,22 +90,15 @@ public class Sira extends JFrame {
         mitad = new JPanel();
         mitad.setLayout(new BorderLayout());
         mitad.setBorder(new EmptyBorder(0,40,0,40));
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("Código");
-        modelo.addColumn("Nombre");
-        modelo.addColumn("Créditos");
-
-        for(Course course : courseList){
-            modelo.addRow(new Object[]{course.getId(), course.getName(), course.getCredits()});
-        }
-
-        tabla = new JTable(modelo);
+        tabla = new JTable(new DefaultTableModel());
         tabla.setBorder(BorderFactory.createMatteBorder(0,1,1,1,Color.BLACK));
         tabla.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
         tabla.setDefaultEditor(Object.class,null);
         tabla.getTableHeader().setReorderingAllowed(false);
         mitad.add(tabla.getTableHeader(),BorderLayout.PAGE_START);
         mitad.add(tabla, BorderLayout.CENTER);
+
+        loadData();
 
     //JPanel abajo
         abajo = new JPanel();
@@ -131,36 +128,58 @@ public class Sira extends JFrame {
 
     }
 
+    private void loadData(){
+        courseList = client.getCourses(studentId);
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.addColumn("Código");
+        modelo.addColumn("Nombre");
+        modelo.addColumn("Créditos");
+
+        for(Course course : courseList){
+            modelo.addRow(new Object[]{course.getId(), course.getName(), course.getCredits()});
+        }
+
+        tabla.setModel(modelo);
+    }
+
     class SiraEventos implements ActionListener {
 
         public void actionPerformed(ActionEvent ae){
 
-            int total=0;
+            int totalCredits = 0;
             for(Course course : courseList){
-                total+= course.getCredits();
+                totalCredits += course.getCredits();
             }
 
-            if(ae.getSource()==matricular) {
-                String resp = "";
-                int valid;
-                JOptionPane.showInputDialog(null, resp);
-                valid = total + client.getCourseCredits(resp);
-                if (valid > 18) {
-                    JOptionPane.showConfirmDialog(null, "No puedes matricular la materia porque excedes los 18 creditos");
-                } else if (client.getCourseQuota(resp) == 0) {
-                    JOptionPane.showConfirmDialog(null, "No puedes matricular porque la materia no tiene cupos suficientes.");
-                } else {
-
+            if(ae.getSource() == matricular) {
+                String courseId = JOptionPane.showInputDialog("Ingresa código de la materia para adicionar.");
+                int courseCredits = client.getCourseCredits(courseId),
+                    validation = totalCredits + courseCredits;
+                if(courseCredits != 0) {
+                    if (validation < 18 || client.getCourseQuota(courseId) > 0) {
+                        client.addCourse(studentId, courseId);
+                        loadData();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No puedes matricular esta materia.");
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null,"Código incorrecto / Materia inexistente.");
                 }
             }
 
-            if(ae.getSource()==cancelar){
-                String resp = "";
-                int sub;
-                JOptionPane.showInputDialog(null,resp);
-                sub = total - client.getCourseCredits(resp);
-                if(sub < 6){
-                    JOptionPane.showConfirmDialog(null,"No puedes cancelar esta materia porque quedarias por debajo de 6 creditos");
+            if(ae.getSource() == cancelar){
+                String courseId = JOptionPane.showInputDialog("Ingresa código de la materia a cancelar.");
+                int courseCredits = client.getCourseCredits(courseId),
+                    validation = totalCredits - courseCredits;
+                if(courseCredits != 0){
+                    if(validation >= 6){
+                        client.cancelCourse(studentId, courseId);
+                        loadData();
+                    }else{
+                        JOptionPane.showMessageDialog(null,"No puedes cancelar esta materia.");
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null,"Código incorrecto / Materia inexistente.");
                 }
             }
         }
