@@ -133,7 +133,6 @@ public class Sira extends JFrame {
 
     class SiraEventos implements ActionListener {
 
-
         public void actionPerformed(ActionEvent ae){
 
             int total=0;
@@ -141,30 +140,29 @@ public class Sira extends JFrame {
                 total+= course.getCredits();
             }
 
-            if(ae.getSource()==matricular){
-                String resp="";
+            if(ae.getSource()==matricular) {
+                String resp = "";
                 int valid;
-                JOptionPane.showInputDialog(null,resp);
+                JOptionPane.showInputDialog(null, resp);
                 valid = total + client.getCourseCredits(resp);
-                if(valid>18){
+                if (valid > 18) {
                     JOptionPane.showConfirmDialog(null, "No puedes matricular la materia porque excedes los 18 creditos");
-                    }else if(client.getCourseQuota(resp)==0){
-                        JOptionPane.showConfirmDialog(null,"No puedes matricular porque la materia no tiene cupos suficientes.");
-                        }else if(){
+                } else if (client.getCourseQuota(resp) == 0) {
+                    JOptionPane.showConfirmDialog(null, "No puedes matricular porque la materia no tiene cupos suficientes.");
+                } else {
 
-                            }
+                }
+            }
 
             if(ae.getSource()==cancelar){
-                String resp2="";
+                String resp = "";
                 int sub;
-                JOptionPane.showInputDialog(null,resp2);
-                sub = total - client.getCourseCredits(resp2);
+                JOptionPane.showInputDialog(null,resp);
+                sub = total - client.getCourseCredits(resp);
                 if(sub < 6){
                     JOptionPane.showConfirmDialog(null,"No puedes cancelar esta materia porque quedarias por debajo de 6 creditos");
                 }
-
             }
-
         }
     }
 }

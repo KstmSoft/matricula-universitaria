@@ -49,13 +49,19 @@ public class Server {
                 request = (Request) inputStream.readObject();
                 switch (request.getQuery()){
                     case "login":
-                        sendToClient(login(request.getArgs()));
+                        sendToClient(login(request.getArgs()[0]));
+                        break;
+                    case "add_course":
+                        sendToClient(addCourse(request.getArgs()[0], request.getArgs()[1]));
+                        break;
+                    case "cancel_course":
+                        sendToClient(cancelCourse(request.getArgs()[0], request.getArgs()[1]));
                         break;
                     case "course_credits":
-                        sendToClient(getCourseCredits(request.getArgs()));
+                        sendToClient(getCourseCredits(request.getArgs()[0]));
                         break;
                     case "course_quota":
-                        sendToClient(getCourseQuota(request.getArgs()));
+                        sendToClient(getCourseQuota(request.getArgs()[0]));
                         break;
                 }
             } catch (ClassNotFoundException e) {
@@ -87,6 +93,34 @@ public class Server {
             throwable.printStackTrace();
         }
         return courses;
+    }
+
+    private boolean cancelCourse(String id, String courseId){
+        String sql;
+        sql = "DELETE FROM enrolled_students WHERE student_id = " + id + " AND course_id = " + courseId;
+        try{
+            Connection connection = database.connect();
+            Statement statement = connection.createStatement();
+            int update = statement.executeUpdate(sql);
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean addCourse(String id, String courseId){
+        String sql;
+        sql = "INSERT INTO enrolled_students (student_id, course_id) VALUES ("+id+", "+courseId+")";
+        try{
+            Connection connection = database.connect();
+            Statement statement = connection.createStatement();
+            int update = statement.executeUpdate(sql);
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return false;
     }
 
     private int getCourseCredits(String id){

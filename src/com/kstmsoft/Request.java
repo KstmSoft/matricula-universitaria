@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Request implements Serializable {
     private final String query;
-    private final String args;
+    private final String[] args;
 
-    public Request(String query, String args) {
+    public Request(String query, String... args) {
         this.query = query;
         this.args = args;
     }
@@ -15,7 +15,7 @@ public class Request implements Serializable {
         return query;
     }
 
-    public String getArgs() {
+    public String[] getArgs() {
         return args;
     }
 }

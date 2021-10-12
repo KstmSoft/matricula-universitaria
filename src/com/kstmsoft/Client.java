@@ -41,6 +41,16 @@ public class Client {
         return (int)sendRequest(request);
     }
 
+    public boolean addCourse(String id, String courseId){
+        Request request = new Request("add_course", id, courseId);
+        return (boolean)sendRequest(request);
+    }
+
+    public boolean cancelCourse(String id, String courseId){
+        Request request = new Request("cancel_course", id, courseId);
+        return (boolean)sendRequest(request);
+    }
+
     private Object sendRequest(Request request){
         Object response = null;
         try {
