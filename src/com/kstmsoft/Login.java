@@ -93,7 +93,7 @@ public class Login extends JFrame{
                         new Sira(client, codigo.getText());
                         setVisible(false);
                     }else{
-                        confirmacion.setText("El usuario no tiene materias registradas o no existe.");
+                        confirmacion.setText("Estudiante no registrado.");
                         confirmacion.setVisible(true);
                     }
                 }catch (NumberFormatException a){
