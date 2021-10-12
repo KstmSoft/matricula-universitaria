@@ -31,6 +31,16 @@ public class Client {
         return (ArrayList<Course>) sendRequest(request);
     }
 
+    public int getCourseCredits(String id){
+        Request request = new Request("course_credits", id);
+        return (int)sendRequest(request);
+    }
+
+    public int getCourseQuota(String id){
+        Request request = new Request("course_quota", id);
+        return (int)sendRequest(request);
+    }
+
     private Object sendRequest(Request request){
         Object response = null;
         try {

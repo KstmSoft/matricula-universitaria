@@ -51,6 +51,12 @@ public class Server {
                     case "login":
                         sendToClient(login(request.getArgs()));
                         break;
+                    case "course_credits":
+                        sendToClient(getCourseCredits(request.getArgs()));
+                        break;
+                    case "course_quota":
+                        sendToClient(getCourseQuota(request.getArgs()));
+                        break;
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -64,6 +70,7 @@ public class Server {
         sql = "SELECT enrolled_students.course_id AS id," +
                 " courses.name AS course_name," +
                 " courses.credits AS credits" +
+                " courses.quota AS quota" +
                 " FROM enrolled_students JOIN courses" +
                 " ON enrolled_students.course_id = courses.id" +
                 " WHERE enrolled_students.student_id = " + id;
@@ -73,13 +80,45 @@ public class Server {
             Statement statement = connection.createStatement();
             ResultSet table = statement.executeQuery(sql);
             while(table.next()){
-                courses.add(new Course(table.getString(1), table.getString(2), table.getInt(3)));
+                courses.add(new Course(table.getString(1), table.getString(2), table.getInt(3), table.getInt(4)));
             }
             connection.close();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
         return courses;
+    }
+
+    private int getCourseCredits(String id){
+        String sql;
+        sql = "SELECT credits FROM courses WHERE id = " + id;
+        int credits = 0;
+        try{
+            Connection connection = database.connect();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            credits = resultSet.getInt(1);
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return credits;
+    }
+
+    public int getCourseQuota(String id) {
+        String sql;
+        sql = "SELECT quota FROM courses WHERE id = " + id;
+        int quota = 0;
+        try{
+            Connection connection = database.connect();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            quota = resultSet.getInt(1);
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return quota;
     }
 
     private void sendToClient(Object response){

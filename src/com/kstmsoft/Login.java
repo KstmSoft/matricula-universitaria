@@ -92,7 +92,7 @@ public class Login extends JFrame{
                 try{
                     ArrayList<Course> courseList = client.login(codigo.getText());
                     if(!courseList.isEmpty()){
-                        new Sira(courseList);
+                        new Sira(client, courseList);
                         setVisible(false);
                     }else{
                         confirmacion.setText("El usuario no tiene materias registradas o no existe.");
