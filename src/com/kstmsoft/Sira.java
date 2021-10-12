@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -21,7 +22,7 @@ public class Sira extends JFrame {
     JTable tabla;
     SiraEventos push;
 
-    public Sira(){
+    public Sira(ArrayList<Course> courseList){
         push = new SiraEventos();
     //JPanel arriba
         arriba= new JPanel();
@@ -34,8 +35,8 @@ public class Sira extends JFrame {
         BufferedImage logo= null;
         BufferedImage logo2= null;
         try {
-            logo = ImageIO.read(new File("Resources/LogoU.png"));
-            logo2= ImageIO.read(new File("Resources/vacio.png"));
+            logo = ImageIO.read(new File("src/com/kstmsoft/Resources/LogoU.png"));
+            logo2= ImageIO.read(new File("src/com/kstmsoft/Resources/vacio.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,7 +86,11 @@ public class Sira extends JFrame {
         modelo.addColumn("Código");
         modelo.addColumn("Nombre");
         modelo.addColumn("Créditos");
-        modelo.addRow(new Object[]{"v1", "v2","v3"});
+
+        for(Course course : courseList){
+            modelo.addRow(new Object[]{course.getId(), course.getName(), course.getCredits()});
+        }
+
         tabla = new JTable(modelo);
         tabla.setBorder(BorderFactory.createMatteBorder(0,1,1,1,Color.BLACK));
         tabla.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
@@ -120,10 +125,6 @@ public class Sira extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
-    }
-
-    public static void main (String[] args){
-        Sira ventana = new Sira();
     }
 
     class SiraEventos implements ActionListener {

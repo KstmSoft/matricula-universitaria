@@ -1,7 +1,9 @@
 package com.kstmsoft;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client {
@@ -10,27 +12,34 @@ public class Client {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
-    public Client (String address, int port){
-        try{
+    public void connect(String address, int port) {
+        try {
             socket = new Socket(address, port);
-            System.out.println("Connected Successfully!");
-
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
-        }catch (UnknownHostException unknownHostException){
-            System.out.println(unknownHostException);
-        }catch (IOException ioException){
-            System.out.println(ioException);
+            System.out.println("Connected Successfully!");
+        } catch (UnknownHostException unknownHostException) {
+            System.out.println(unknownHostException.getMessage());
+        } catch (IOException ioException) {
+            System.out.println(ioException.getMessage());
         }
     }
 
-    public void login(){
+    public ArrayList<Course> login(String id) {
+        Request request = new Request("login", id);
+        return (ArrayList<Course>) sendRequest(request);
+    }
+
+    private Object sendRequest(Request request){
+        Object response = null;
         try {
-            outputStream.writeObject("login");
+            outputStream.writeObject(request);
             outputStream.flush();
-        } catch (IOException e) {
+            response = inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        return response;
     }
 }

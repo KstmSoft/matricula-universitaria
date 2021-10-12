@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Login extends JFrame{
     JPanel panelLogin, panelBienvenida;
@@ -80,15 +81,23 @@ public class Login extends JFrame{
     }
 
     public static void main (String[] args){
-        Login ventana = new Login();
-        client = new Client("localhost", 8080);
+        new Login();
+        client = new Client();
+        client.connect("localhost", 8080);
     }
 
     class Eventos implements ActionListener{
         public void actionPerformed(ActionEvent ae){
             if(ae.getSource() == ingresar){
                 try{
-                    client.login();
+                    ArrayList<Course> courseList = client.login(codigo.getText());
+                    if(!courseList.isEmpty()){
+                        new Sira(courseList);
+                        setVisible(false);
+                    }else{
+                        confirmacion.setText("El usuario no tiene materias registradas o no existe.");
+                        confirmacion.setVisible(true);
+                    }
                 }catch (NumberFormatException a){
                     a.printStackTrace();
                     confirmacion.setText("Escriba numeros, no texto.");
