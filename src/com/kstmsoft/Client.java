@@ -11,6 +11,7 @@ public class Client {
     protected Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private Logs logs;
 
     public void connect(String address, int port) {
         try {
@@ -19,11 +20,19 @@ public class Client {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             System.out.println("Connected Successfully!");
+            logs = new Logs();
+            logs.initLogging();
         } catch (UnknownHostException unknownHostException) {
             System.out.println(unknownHostException.getMessage());
         } catch (IOException ioException) {
             System.out.println(ioException.getMessage());
         }
+    }
+
+    public boolean studentExist(String id){
+        Request request = new Request("student_exist", id);
+        logs.writeLog("Estudiante " + id + " ha iniciado sesión.");
+        return (boolean)sendRequest(request);
     }
 
     public ArrayList<Course> getCourses(String id) {
@@ -43,11 +52,13 @@ public class Client {
 
     public void addCourse(String id, String courseId){
         Request request = new Request("add_course", id, courseId);
+        logs.writeLog("Estudiante " + id + " ha matriculado la asignatura " + courseId);
         sendRequest(request);
     }
 
     public void cancelCourse(String id, String courseId){
         Request request = new Request("cancel_course", id, courseId);
+        logs.writeLog("Estudiante " + id + " ha cancelado la asignatura " + courseId);
         sendRequest(request);
     }
 
@@ -56,7 +67,9 @@ public class Client {
         try {
             outputStream.writeObject(request);
             outputStream.flush();
+
             response = inputStream.readObject();
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.io.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class Login extends JFrame{
     JPanel panelLogin, panelBienvenida;
@@ -90,8 +89,7 @@ public class Login extends JFrame{
         public void actionPerformed(ActionEvent ae){
             if(ae.getSource() == ingresar){
                 try{
-                    ArrayList<Course> courseList = client.getCourses(codigo.getText());
-                    if(!courseList.isEmpty()){
+                    if(client.studentExist(codigo.getText())){
                         new Sira(client, codigo.getText());
                         setVisible(false);
                     }else{

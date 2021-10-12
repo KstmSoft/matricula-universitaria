@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-
+import java.util.Collection;
+import java.util.Objects;
 
 public class Sira extends JFrame {
     Container contenedor;
@@ -156,11 +157,19 @@ public class Sira extends JFrame {
                 int courseCredits = client.getCourseCredits(courseId),
                     validation = totalCredits + courseCredits;
                 if(courseCredits != 0) {
-                    if (validation < 18 || client.getCourseQuota(courseId) > 0) {
-                        client.addCourse(studentId, courseId);
-                        loadData();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No puedes matricular esta materia.");
+                    if(!courseList.stream().anyMatch(obj -> obj.getId().equals(courseId))){
+                        if(client.getCourseQuota(courseId) > 0){
+                            if (validation < 18) {
+                                client.addCourse(studentId, courseId);
+                                loadData();
+                            } else {
+                                JOptionPane.showMessageDialog(null, "No puedes matricular esta materia, tienes mas de 18 créditos.");
+                            }
+                        }else{
+                            JOptionPane.showMessageDialog(null,"Esta materia no tiene mas cupos.");
+                        }
+                    }else {
+                        JOptionPane.showMessageDialog(null,"Esta materia se encuentra agregada actualmente.");
                     }
                 }else{
                     JOptionPane.showMessageDialog(null,"Código incorrecto / Materia inexistente.");
@@ -176,7 +185,7 @@ public class Sira extends JFrame {
                         client.cancelCourse(studentId, courseId);
                         loadData();
                     }else{
-                        JOptionPane.showMessageDialog(null,"No puedes cancelar esta materia.");
+                        JOptionPane.showMessageDialog(null,"No puedes cancelar esta materia, tendrías menos de 6 créditos.");
                     }
                 }else{
                     JOptionPane.showMessageDialog(null,"Código incorrecto / Materia inexistente.");

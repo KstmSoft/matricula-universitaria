@@ -50,14 +50,15 @@ public class Server {
                 switch (request.getQuery()){
                     case "student_exist":
                         sendToClient(studentExist(request.getArgs()[0]));
+                        break;
                     case "get_courses":
                         sendToClient(getCourses(request.getArgs()[0]));
                         break;
                     case "add_course":
-                        addCourse(request.getArgs()[0], request.getArgs()[1]);
+                        sendToClient(addCourse(request.getArgs()[0], request.getArgs()[1]));
                         break;
                     case "cancel_course":
-                        cancelCourse(request.getArgs()[0], request.getArgs()[1]);
+                        sendToClient(cancelCourse(request.getArgs()[0], request.getArgs()[1]));
                         break;
                     case "course_credits":
                         sendToClient(getCourseCredits(request.getArgs()[0]));
@@ -74,7 +75,8 @@ public class Server {
 
     private boolean studentExist(String id) {
         String sql;
-        sql = "SELECT EXISTS(SELECT count(id) FROM students WHERE id = '" + id + "')";
+        sql = "SELECT EXISTS(SELECT id FROM students WHERE id = '" + id + "')";
+
         boolean result = false;
         try{
             Connection connection = database.connect();
@@ -87,6 +89,7 @@ public class Server {
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
+
         return result;
     }
 
@@ -115,9 +118,10 @@ public class Server {
         return courses;
     }
 
-    private void cancelCourse(String id, String courseId){
+    private boolean cancelCourse(String id, String courseId){
         String sql;
-        sql = "DELETE FROM enrolled_students WHERE student_id = '" + id + "' AND course_id = '" + courseId + "'";
+        sql = "DELETE FROM enrolled_students WHERE student_id = '" + id + "' AND course_id = '" + courseId + "';" +
+              "UPDATE courses SET quota = quota + 1 WHERE id = '" + courseId + "';";
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
@@ -126,11 +130,15 @@ public class Server {
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
+        return true;
     }
 
-    private void addCourse(String id, String courseId){
+    private boolean addCourse(String id, String courseId){
         String sql;
-        sql = "INSERT INTO enrolled_students (student_id, course_id) VALUES ('"+id+"', '"+courseId+"')";
+        sql = "INSERT INTO enrolled_students (student_id, course_id) VALUES ('"+id+"', '"+courseId+"');" +
+              "UPDATE courses SET quota = quota - 1 WHERE id = '" + courseId + "';";
+
+        System.out.println(sql);
         try{
             Connection connection = database.connect();
             Statement statement = connection.createStatement();
@@ -139,6 +147,7 @@ public class Server {
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
+        return true;
     }
 
     private int getCourseCredits(String id){
@@ -196,7 +205,7 @@ class Database{
     Connection connection;
 
     public Database(){
-        url = "jdbc:mysql://localhost:3306/sira";
+        url = "jdbc:mysql://localhost:3306/sira?allowMultiQueries=true";
         user = "root";
         password = "";
     }
