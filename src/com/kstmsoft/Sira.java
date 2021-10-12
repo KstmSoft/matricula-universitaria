@@ -128,7 +128,6 @@ public class Sira extends JFrame {
     }
 
     class SiraEventos implements ActionListener {
-
         public void actionPerformed(ActionEvent ae){
             if(ae.getSource()==matricular){
                 JOptionPane.showConfirmDialog(null, "xd");
